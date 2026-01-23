@@ -2,12 +2,16 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from app.core.config import *
 from app.db.session import Session
+from app.db.session import engine
+from app.db.base import Base
+import app.models.user
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     db = Session()
     try:
         print('Database Connection Successful')
+        Base.metadata.create_all(bind=engine)
     finally:
         db.close()
     yield
@@ -18,7 +22,7 @@ version = APP_VERSION
 environment = ENVIRONMENT
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    pass
 
 @app.get('/health')
 def health_check():
