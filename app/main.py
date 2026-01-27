@@ -1,14 +1,14 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from app.core.config import *
-from app.db.session import Session
+from app.db.session import DBSession
 from app.db.session import engine
 from app.db.base import Base
 import app.models.user
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    db = Session()
+    db = DBSession()
     try:
         print('Database Connection Successful')
         Base.metadata.create_all(bind=engine)

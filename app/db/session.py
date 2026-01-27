@@ -4,4 +4,11 @@ from app.core.config import DATABASE_URL
 
 engine = create_engine(DATABASE_URL)
 
-Session = sessionmaker(bind=engine)
+DBSession = sessionmaker(bind=engine)
+
+def get_db():
+    db = DBSession()
+    try:
+        yield db
+    finally:
+        db.close()
