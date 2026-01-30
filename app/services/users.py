@@ -2,21 +2,15 @@ from passlib.context import CryptContext
 from sqlalchemy.exc import IntegrityError
 from app.models.user import User
 from sqlalchemy.orm import Session
-
-pwd_context = CryptContext(
-    schemes=['bcrypt'],
-    deprecated='auto',
-)
+from app.core.securities import hash_password, verify_password
 
 class UserAlreadyExistsError(Exception):
     """ Raised when the user already exists """
     pass
 
-def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+class InvalidCredentialsError(Exception):
+    """ Raised when the credentials are invalid"""
+    pass
 
 def create_user(db: Session, email: str, password: str) -> User:
     hashed_password = hash_password(password)
@@ -34,4 +28,15 @@ def create_user(db: Session, email: str, password: str) -> User:
     except IntegrityError:
         db.rollback()
         raise UserAlreadyExistsError('Email already registered')
+    return user
+
+def authenticate_user(db: Session, email: str, password: str) -> User:
+    user = db.query(User).filter(User.email == email).first()
+
+    if not user:
+        raise InvalidCredentialsError("Invalid credentials")
+
+    if not verify_password(password, user.hashed_password):
+        raise InvalidCredentialsError("Invalid credentials")
+
     return user
