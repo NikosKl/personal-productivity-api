@@ -2,7 +2,7 @@ from passlib.context import CryptContext
 from sqlalchemy.exc import IntegrityError
 from app.models.user import User
 from sqlalchemy.orm import Session
-from app.core.securities import hash_password, verify_password
+from app.core.security import hash_password, verify_password
 
 class UserAlreadyExistsError(Exception):
     """ Raised when the user already exists """

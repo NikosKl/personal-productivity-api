@@ -1,7 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-
-from app.core.config import JWT_ACCESS_TOKEN_EXPIRE_MINUTES
-from app.core.securities import create_access_token, get_current_user
+from app.core.security import create_access_token, get_current_user
 from app.db.session import get_db
 from sqlalchemy.orm import Session
 
