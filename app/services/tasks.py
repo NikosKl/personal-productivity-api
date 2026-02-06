@@ -1,4 +1,5 @@
-from sqlalchemy import select, delete
+from sqlalchemy import select
+from typing import cast
 from sqlalchemy.orm import Session
 from app.models.task import Task
 from app.models.user import User
@@ -24,7 +25,10 @@ def create_task(db: Session, user: User, task_data: TaskCreate) -> Task:
     return task
 
 def get_user_tasks(db: Session, user: User) -> list[Task]:
-    return db.query(Task).filter(Task.user_id == user.id).all()
+    stmt = select(Task).where(Task.user_id == user.id)
+
+    tasks = cast(list[Task], db.scalars(stmt).all())
+    return tasks
 
 def update_task(db: Session, user: User, task_id: int, task_data: TaskUpdate) -> Task:
 
