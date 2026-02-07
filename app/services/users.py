@@ -1,4 +1,5 @@
-from passlib.context import CryptContext
+from pydantic import EmailStr
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from app.models.user import User
 from sqlalchemy.orm import Session
@@ -12,7 +13,7 @@ class InvalidCredentialsError(Exception):
     """ Raised when the credentials are invalid"""
     pass
 
-def create_user(db: Session, email: str, password: str) -> User:
+def create_user(db: Session, email: EmailStr, password: str) -> User:
     hashed_password = hash_password(password)
 
     user = User(
@@ -30,10 +31,12 @@ def create_user(db: Session, email: str, password: str) -> User:
         raise UserAlreadyExistsError('Email already registered')
     return user
 
-def authenticate_user(db: Session, email: str, password: str) -> User:
-    user = db.query(User).filter(User.email == email).first()
+def authenticate_user(db: Session, email: EmailStr, password: str) -> User:
+    stmt = select(User).where(User.email == email)
 
-    if not user:
+    user = db.scalar(stmt)
+
+    if user is None:
         raise InvalidCredentialsError("Invalid credentials")
 
     if not verify_password(password, user.hashed_password):
