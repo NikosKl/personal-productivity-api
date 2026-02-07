@@ -9,7 +9,7 @@ from app.services.users import create_user, UserAlreadyExistsError, authenticate
 router = APIRouter(prefix='/auth', tags=['Auth'])
 
 @router.post('/register', response_model=UserRead)
-def register_user(user: UserCreate, db: Session = Depends(get_db)):
+def register_user_route(user: UserCreate, db: Session = Depends(get_db)):
     try:
         created_user = create_user(
             db,
@@ -21,7 +21,7 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     return created_user
 
 @router.post('/login', response_model=Token)
-def login_user(user: UserLogin, db: Session = Depends(get_db)):
+def login_user_route(user: UserLogin, db: Session = Depends(get_db)):
     try:
         authenticated_user = authenticate_user(
             db,
