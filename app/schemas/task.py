@@ -13,6 +13,7 @@ class TaskRead(BaseModel):
     priority: int
     status: str
     created_at: datetime
+    completed_at: datetime | None = None
 
     model_config = {
         'from_attributes': True}
