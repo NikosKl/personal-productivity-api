@@ -5,7 +5,8 @@ from app.core.security import get_current_user
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.task import TaskRead, TaskCreate, TaskUpdate
-from app.services.tasks import create_task, get_user_tasks, TaskNotFoundError, update_task, delete_task
+from app.services.tasks import create_task, get_user_tasks, TaskNotFoundError, update_task, delete_task, complete_task, \
+    InvalidTaskStateError, reset_task
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
@@ -33,4 +34,25 @@ def delete_task_route(task_id: int, db: Session = Depends(get_db), current_user:
         delete_task(db, current_user, task_id)
     except TaskNotFoundError:
         raise HTTPException(status_code=404, detail="Task not found")
+
+@router.patch('/{task_id}/complete', response_model=TaskRead)
+def complete_task_route(task_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    try:
+        task = complete_task(db, current_user, task_id)
+        return task
+    except TaskNotFoundError:
+        raise HTTPException(status_code=404, detail="Task not found")
+    except InvalidTaskStateError:
+        raise HTTPException(status_code=400, detail="Invalid state transition")
+
+@router.patch('/{task_id}/reset', response_model=TaskRead)
+def reset_task_route(task_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    try:
+        task = reset_task(db, current_user, task_id)
+        return task
+    except TaskNotFoundError:
+        raise HTTPException(status_code=404, detail="Task not found")
+    except InvalidTaskStateError:
+        raise HTTPException(status_code=400, detail="Invalid state transition")
+
 

@@ -1,3 +1,5 @@
+from datetime import UTC, datetime
+
 from sqlalchemy import select
 from typing import cast
 from sqlalchemy.orm import Session
@@ -7,6 +9,10 @@ from app.schemas.task import TaskCreate, TaskUpdate
 
 class TaskNotFoundError(Exception):
     """Raised when a task is not found"""
+    pass
+
+class InvalidTaskStateError(Exception):
+    """Raised when a task state is not valid"""
     pass
 
 def create_task(db: Session, user: User, task_data: TaskCreate) -> Task:
@@ -60,3 +66,42 @@ def delete_task(db: Session, user: User, task_id: int) -> None:
 
     db.delete(task)
     db.commit()
+
+def complete_task(db: Session, user: User, task_id: int) -> Task:
+    stmt = select(Task).where(
+        Task.id == task_id,
+        Task.user_id == user.id)
+
+    task = db.scalar(stmt)
+
+    if task is None:
+        raise TaskNotFoundError('Task not found')
+    if task.status == 'completed':
+        raise InvalidTaskStateError('Task already completed')
+
+    task.status = 'completed'
+    task.completed_at = datetime.now(UTC)
+
+    db.commit()
+    db.refresh(task)
+    return task
+
+def reset_task(db: Session, user: User, task_id: int) -> Task:
+    stmt = select(Task).where(
+        Task.id == task_id,
+        Task.user_id == user.id
+    )
+
+    task = db.scalar(stmt)
+
+    if task is None:
+        raise TaskNotFoundError('Task not found')
+    if task.status == 'pending':
+        raise InvalidTaskStateError('Task already pending')
+
+    task.status = 'pending'
+    task.completed_at = None
+
+    db.commit()
+    db.refresh(task)
+    return task
