@@ -8,6 +8,7 @@ from app.db.session import DBSession
 from app.db.session import engine
 from app.db.base import Base
 from app.api.auth import router as auth_router
+from app.api.tasks import router as tasks_router
 import app.models.user
 
 @asynccontextmanager
@@ -22,6 +23,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(auth_router)
+app.include_router(tasks_router)
 
 name = APP_NAME
 version = APP_VERSION
