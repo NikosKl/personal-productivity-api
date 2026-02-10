@@ -23,7 +23,7 @@ def create_task_route(task_data: TaskCreate, db: Session = Depends(get_db), curr
 def read_task_route(
         limit: int = Query(10, gt = 0),
         offset: int = Query(0, ge = 0),
-        task_status: TaskStatusParam = None,
+        task_status: TaskStatusParam | None = None,
         order: Literal['asc', 'desc'] = 'desc',
         db: Session = Depends(get_db),
         current_user: User = Depends(get_current_user)):
