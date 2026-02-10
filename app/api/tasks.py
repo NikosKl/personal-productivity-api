@@ -12,7 +12,7 @@ from app.services.tasks import create_task, get_user_tasks, TaskNotFoundError, u
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
-TaskStatusParam = Annotated[Literal['pending', 'completed'] | None, Query(None, description="Filter by status")]
+TaskStatusParam = Annotated[Literal['pending', 'completed'] | None, Query(None, description="Filter by status: pending or completed")]
 
 @router.post("", response_model=TaskRead)
 def create_task_route(task_data: TaskCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
