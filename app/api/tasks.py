@@ -1,4 +1,6 @@
+from typing import Literal, Annotated
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.params import Query
 from starlette import status
 from sqlalchemy.orm import Session
 from app.core.security import get_current_user
@@ -10,15 +12,24 @@ from app.services.tasks import create_task, get_user_tasks, TaskNotFoundError, u
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
+TaskStatusParam = Annotated[Literal['pending', 'completed'] | None, Query(None, description="Filter by status")]
+
 @router.post("", response_model=TaskRead)
 def create_task_route(task_data: TaskCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     task = create_task(db, current_user, task_data)
     return task
 
 @router.get("", response_model=list[TaskRead])
-def read_task_route(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    user_tasks = get_user_tasks(db, current_user)
-    return user_tasks
+def read_task_route(
+        limit: int = Query(10, gt = 0),
+        offset: int = Query(0, ge = 0),
+        task_status: TaskStatusParam = None,
+        order: Literal['asc', 'desc'] = 'desc',
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)):
+
+    tasks = get_user_tasks(db, current_user, limit, offset, task_status, order)
+    return tasks
 
 @router.put("/{task_id}", response_model=TaskRead)
 def update_task_route(task_id: int, task_data: TaskUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):

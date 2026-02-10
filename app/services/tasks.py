@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
 
 from sqlalchemy import select
-from typing import cast
+from typing import cast, Literal
 from sqlalchemy.orm import Session
 from app.models.task import Task
 from app.models.user import User
@@ -30,8 +30,18 @@ def create_task(db: Session, user: User, task_data: TaskCreate) -> Task:
 
     return task
 
-def get_user_tasks(db: Session, user: User) -> list[Task]:
+def get_user_tasks(db: Session, user: User, limit: int, offset: int, task_status: Literal['pending', 'completed'] | None, order: Literal['asc', 'desc']) -> list[Task]:
     stmt = select(Task).where(Task.user_id == user.id)
+
+    if task_status is not None:
+        stmt = stmt.where(Task.status == task_status)
+
+    if order == 'asc':
+        stmt = stmt.order_by(Task.created_at.asc())
+    else:
+        stmt = stmt.order_by(Task.created_at.desc())
+
+    stmt = stmt.limit(limit).offset(offset)
 
     tasks = cast(list[Task], db.scalars(stmt).all())
     return tasks
