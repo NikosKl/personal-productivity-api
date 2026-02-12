@@ -1,11 +1,11 @@
 from datetime import timezone, datetime, timedelta
 import jwt
-from fastapi import Depends, HTTPException
+from fastapi import Depends
 from jwt.exceptions import InvalidTokenError
+from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from app.db.session import get_db
-
 from app.core.config import JWT_ALGORITHM, JWT_SECRET, JWT_ACCESS_TOKEN_EXPIRE_MINUTES
 from app.models.user import User
 
@@ -13,6 +13,8 @@ pwd_context = CryptContext(
     schemes=['bcrypt'],
     deprecated='auto',
 )
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/auth/login')
 
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
@@ -44,7 +46,7 @@ def decode_token(token: str) -> dict:
     except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
         raise InvalidTokenError()
 
-def get_current_user(token: str, db: Session = Depends(get_db)):
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     try:
         payload = decode_token(token)
         user_id = payload['sub']
