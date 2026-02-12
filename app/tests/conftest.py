@@ -2,6 +2,11 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from starlette.testclient import TestClient
+
+import os
+
+os.environ['JWT_SECRET'] = 'test_secret'
+
 from app.db.base import Base
 from app.db.session import get_db
 from app.main import app
