@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import EmailStr, TypeAdapter
 from app.core.security import create_access_token, get_current_user
 from app.db.session import get_db
 from sqlalchemy.orm import Session
 from app.models.user import User
-from app.schemas.user import UserCreate, UserRead, UserLogin, Token
+from app.schemas.user import UserCreate, UserRead, Token
 from app.services.users import create_user, UserAlreadyExistsError, authenticate_user, InvalidCredentialsError
 
 router = APIRouter(prefix='/auth', tags=['Auth'])
@@ -21,11 +23,12 @@ def register_user_route(user: UserCreate, db: Session = Depends(get_db)):
     return created_user
 
 @router.post('/login', response_model=Token)
-def login_user_route(user: UserLogin, db: Session = Depends(get_db)):
+def login_user_route(user: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     try:
+        email = TypeAdapter(EmailStr).validate_python(user.username)
         authenticated_user = authenticate_user(
             db,
-            email=user.email,
+            email=email,
             password=user.password)
     except InvalidCredentialsError:
         raise HTTPException(status_code=401, detail='Invalid credentials')
