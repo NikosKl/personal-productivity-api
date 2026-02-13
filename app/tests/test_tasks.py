@@ -38,5 +38,53 @@ def test_get_tasks(client):
     for task in data:
         assert task['title'] in ['task1', 'task2']
 
+def test_user_cannot_see_other_users(client):
+    headers_a = get_auth_headers(client, email='user_a@example.com', password='password_a')
 
+    client.post('/tasks', json={'title': 'task1', 'priority': 1}, headers=headers_a)
+    client.post('/tasks', json={'title': 'task2', 'priority': 1}, headers=headers_a)
+
+    headers_b = get_auth_headers(client, email='user_b@example.com', password='password_b')
+
+    response = client.get('/tasks', headers=headers_b)
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert isinstance(data, list)
+    assert len(data) == 0
+
+def test_user_cannot_update_other_users_tasks(client):
+    headers_a = get_auth_headers(client, email='user_a@example.com', password='password_a')
+
+    client.post('/tasks', json={'title': 'task1', 'priority': 1}, headers=headers_a)
+
+    headers_b = get_auth_headers(client, email='user_b@example.com', password='password_b')
+
+    response = client.put('/tasks/1', json={'title': 'test'}, headers=headers_b)
+
+    assert response.status_code == 404
+
+def test_user_cannot_delete_other_users_tasks(client):
+    headers_a = get_auth_headers(client, email='user_a@example.com', password='password_a')
+
+    client.post('/tasks', json={'title': 'task1', 'priority': 1}, headers=headers_a)
+
+    headers_b = get_auth_headers(client, email='user_b@example.com', password='password_b')
+
+    response = client.delete('/tasks/1', headers=headers_b)
+
+    assert response.status_code == 404
+
+def test_user_cannot_complete_other_users_tasks(client):
+    headers_a = get_auth_headers(client, email='user_a@example.com', password='password_a')
+
+    client.post('/tasks', json={'title': 'task1', 'priority': 1}, headers=headers_a)
+
+    headers_b = get_auth_headers(client, email='user_b@example.com', password='password_b')
+
+    response = client.patch('/tasks/1/complete', headers=headers_b)
+
+    assert response.status_code == 200
 
