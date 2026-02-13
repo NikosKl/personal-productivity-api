@@ -86,5 +86,28 @@ def test_user_cannot_complete_other_users_tasks(client):
 
     response = client.patch('/tasks/1/complete', headers=headers_b)
 
+    assert response.status_code == 404
+
+def test_complete_tasks(client):
+    headers = get_auth_headers(client)
+
+    client.post('/tasks', json={'title': 'task1', 'priority': 1}, headers=headers)
+
+    response = client.patch('/tasks/1/complete', headers=headers)
     assert response.status_code == 200
+    data = response.json()
+    assert data['status'] == 'completed'
+    assert data['completed_at'] is not None
+
+    response = client.patch('/tasks/1/complete', headers=headers)
+    assert response.status_code == 400
+
+    response = client.patch('/tasks/1/reset', headers=headers)
+    assert response.status_code == 200
+    data = response.json()
+    assert data['status'] == 'pending'
+    assert data['completed_at'] is None
+
+    response = client.patch('/tasks/1/reset', headers=headers)
+    assert response.status_code == 400
 
