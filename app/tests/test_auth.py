@@ -24,7 +24,7 @@ def test_login_success(client):
     payload ={'email': 'login_success@example.com', 'password': 'correctpassword'}
     client.post('/auth/register', json=payload)
 
-    response = client.post('/auth/login', json=payload)
+    response = client.post('/auth/login', data={'username': payload['email'], 'password': payload['password']})
 
     assert response.status_code == 200
     data = response.json()
@@ -35,7 +35,7 @@ def test_login_failure(client):
     payload = {'email': 'login_failure@example.com', 'password': 'correctpassword'}
     client.post('/auth/register', json=payload)
 
-    response = client.post('/auth/login', json={'email': 'login_failure@example.com', 'password': 'wrongpassword'})
+    response = client.post('/auth/login', data={'username': 'login_failure@example.com', 'password': 'wrongpassword'})
 
     assert response.status_code == 401
 

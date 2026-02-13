@@ -1,7 +1,8 @@
 def get_auth_headers(client, email='user@example.com', password='test_password'):
     payload = {'email': email, 'password': password}
     client.post('/auth/register', json=payload)
-    response = client.post('/auth/login', json=payload)
+    login_payload = {'username': email, 'password': password}
+    response = client.post('/auth/login', data=login_payload)
     token = response.json()['access_token']
     return {'Authorization': f'Bearer {token}'}
 
