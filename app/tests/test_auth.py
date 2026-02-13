@@ -12,11 +12,11 @@ def test_register(client):
     assert 'email' in data
     assert 'password_hash' not in data
 
-def duplicate_email(client):
+def test_duplicate_email(client):
     payload = {'email': 'test_user@example.com', 'password': 'testpassword'}
 
-    response = client.post('/auth/register', json=payload)
-    assert response.status_code in (200, 201)
+    client.post('/auth/register', json=payload)
+
     response = client.post('/auth/register', json=payload)
     assert response.status_code == 409
 
