@@ -111,3 +111,43 @@ def test_complete_tasks(client):
     response = client.patch('/tasks/1/reset', headers=headers)
     assert response.status_code == 400
 
+def test_update_tasks(client):
+    headers = get_auth_headers(client)
+
+    client.post('/tasks', json={'title': 'original', 'priority': 1}, headers=headers)
+
+    response = client.put('/tasks/1', json={'title': 'updated title'}, headers=headers)
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data['title'] == 'updated title'
+    assert data['priority'] == 1
+    assert data['description'] is None
+    assert data['status'] == 'pending'
+
+    response = client.put('/tasks/1', json={'priority': 3}, headers=headers)
+    data = response.json()
+    assert data['priority'] == 3
+    assert data['title'] == 'updated title'
+
+def test_delete_tasks(client):
+    headers = get_auth_headers(client)
+
+    client.post('/tasks', json={'title': 'task1', 'priority': 1}, headers=headers)
+
+    response = client.delete('/tasks/1', headers=headers)
+    assert response.status_code == 204
+
+    response = client.get('/tasks', headers=headers)
+    assert response.status_code == 200
+    data = response.json()
+    assert isinstance(data, list)
+    assert len(data) == 0
+
+    response = client.put('/tasks/1', json={'title': 'updated task', 'priority': 1}, headers=headers)
+    assert response.status_code == 404
+
+    response = client.patch('/tasks/1/complete', json={'title': 'test task', 'priority': 1}, headers=headers)
+    assert response.status_code == 404
+
