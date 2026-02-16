@@ -1,3 +1,5 @@
+from pytest import approx
+
 def get_auth_headers(client, email='user@example.com', password='test_password'):
     payload = {'email': email, 'password': password}
     client.post('/auth/register', json=payload)
@@ -150,4 +152,25 @@ def test_delete_tasks(client):
 
     response = client.patch('/tasks/1/complete', json={'title': 'test task', 'priority': 1}, headers=headers)
     assert response.status_code == 404
+
+def test_task_stats(client):
+    headers = get_auth_headers(client)
+
+    client.post('/tasks', json={'title': 'task1', 'priority': 1}, headers=headers)
+    client.post('/tasks', json={'title': 'task2', 'priority': 1}, headers=headers)
+    client.post('/tasks', json={'title': 'task3', 'priority': 1}, headers=headers)
+
+    response = client.patch('/tasks/2/complete', headers=headers)
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data['status'] == 'completed'
+
+    response = client.get('/tasks/stats', headers=headers)
+    assert response.status_code == 200
+    data = response.json()
+    assert data['total'] == 3
+    assert data['pending'] == 2
+    assert data['completed'] == 1
+    assert data['completion_rate'] == approx(33.33)
 

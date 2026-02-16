@@ -6,7 +6,9 @@ from sqlalchemy.orm import Session
 from app.core.security import get_current_user
 from app.db.session import get_db
 from app.models.user import User
+from app.schemas.stats import TaskStats
 from app.schemas.task import TaskRead, TaskCreate, TaskUpdate
+from app.services.statistics import get_task_stats
 from app.services.tasks import create_task, get_user_tasks, TaskNotFoundError, update_task, delete_task, complete_task, \
     InvalidTaskStateError, reset_task
 
@@ -66,4 +68,7 @@ def reset_task_route(task_id: int, db: Session = Depends(get_db), current_user: 
     except InvalidTaskStateError:
         raise HTTPException(status_code=400, detail="Invalid state transition")
 
-
+@router.get('/stats', response_model=TaskStats)
+def task_stats_route(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+        task_stats = get_task_stats(db, user)
+        return task_stats

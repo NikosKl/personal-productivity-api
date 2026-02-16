@@ -1,5 +1,4 @@
 from datetime import UTC, datetime
-
 from sqlalchemy import select
 from typing import cast, Literal
 from sqlalchemy.orm import Session
