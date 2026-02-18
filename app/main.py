@@ -5,8 +5,6 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from app.core.config import *
 from app.db.session import DBSession
-from app.db.session import engine
-from app.db.base import Base
 from app.api.auth import router as auth_router
 from app.api.tasks import router as tasks_router
 import app.models.user
@@ -16,7 +14,6 @@ async def lifespan(app: FastAPI):
     db = DBSession()
     try:
         print('Database Connection Successful')
-        Base.metadata.create_all(bind=engine)
     finally:
         db.close()
     yield
