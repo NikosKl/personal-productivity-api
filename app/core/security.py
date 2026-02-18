@@ -49,7 +49,7 @@ def decode_token(token: str) -> dict:
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     try:
         payload = decode_token(token)
-        user_id = payload['sub']
+        user_id = int(payload['sub'])
         if user_id is None:
             raise InvalidTokenError()
         user = db.query(User).filter(User.id == user_id).first()
