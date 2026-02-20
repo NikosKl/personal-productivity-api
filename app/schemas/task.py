@@ -1,4 +1,6 @@
 from datetime import datetime
+from typing import Annotated
+
 from pydantic import BaseModel, Field
 
 class TaskCreate(BaseModel):
@@ -21,4 +23,4 @@ class TaskRead(BaseModel):
 class TaskUpdate(BaseModel):
     title: str | None = None
     description: str | None = None
-    priority: int | None = None
+    priority: Annotated[int, Field(ge=1, le=3)] | None = None
