@@ -28,7 +28,13 @@ environment = ENVIRONMENT
 
 @app.get("/")
 def read_root():
-    return {"message": "Productivity API is running"}
+    return {
+        'name': 'Productivity API',
+        'version': version,
+        'environment': environment,
+        'docs': '/docs',
+        'redoc': '/redoc'
+    }
 
 @app.get('/health')
 def health_check():
