@@ -29,7 +29,7 @@ environment = ENVIRONMENT
 @app.get("/")
 def read_root():
     return {
-        'name': 'Productivity API',
+        'name': 'Personal Productivity API',
         'version': version,
         'environment': environment,
         'docs': '/docs',
