@@ -1,7 +1,7 @@
 from logging.config import fileConfig
 from app.core.config import DATABASE_URL
 from app.db.base import Base
-import app.models
+from app.models import user, task, habit, habit_logs
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
