@@ -1,14 +1,10 @@
 from datetime import date, timedelta
-
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-
-from app.models import habit_logs
 from app.models.habit import Habits
 from app.models.habit_logs import HabitLogs
 from app.models.user import User
 from app.schemas.habit import HabitCreate, HabitUpdate, HabitLogCreate
-
 
 class HabitNotFoundError(Exception):
     """Raised when a habit is not found"""
