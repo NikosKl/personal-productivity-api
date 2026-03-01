@@ -28,3 +28,5 @@ class HabitLogRead(BaseModel):
     habit_id: int
     log_date: date
     created_at: datetime
+
+    model_config = {'from_attributes': True}
