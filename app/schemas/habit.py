@@ -30,3 +30,9 @@ class HabitLogRead(BaseModel):
     created_at: datetime
 
     model_config = {'from_attributes': True}
+
+class HabitStreakRead(BaseModel):
+    habit_id: int
+    current_streak: int
+
+    model_config = {'from_attributes': True}

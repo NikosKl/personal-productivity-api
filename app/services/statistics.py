@@ -1,14 +1,12 @@
 from datetime import timedelta
 from sqlalchemy import select, func
 from sqlalchemy.orm import Session
-
 from app.models.habit import Habits
 from app.models.habit_logs import HabitLogs
 from app.models.task import Task
 from app.models.user import User
 from app.schemas.stats import TaskStats
 from app.services.habits import HabitNotFoundError
-
 
 def get_task_stats(db: Session, user: User) -> TaskStats:
     id_validation = Task.user_id == user.id
