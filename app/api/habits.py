@@ -35,7 +35,7 @@ def delete_habit_route(habit_id: int, db: Session = Depends(get_db), current_use
     except HabitNotFoundError:
         raise HTTPException(status_code=404, detail="Habit not found")
 
-@router.put("/{habit_id}/log", response_model=HabitLogRead)
+@router.post("/{habit_id}/log", response_model=HabitLogRead)
 def log_habit_route(habit_id: int, log_data: HabitLogCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     try:
         habit_log = log_habit(db, current_user, habit_id, log_data)
