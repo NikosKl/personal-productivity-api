@@ -184,3 +184,84 @@ def test_delete_habit_cascade_logs(client):
 
     response = client.post('/habits/1/log', json={'log_date': '2026-03-02'}, headers=headers)
     assert response.status_code == 404
+
+def test_daily_streak_consecutive(client):
+    headers = get_auth_headers(client)
+
+    response = client.post('/habits', json={'name': 'habit', 'frequency': 'daily'}, headers=headers)
+    assert response.status_code == 200
+
+    client.post('/habits/1/log', json={'log_date': '2026-03-04'}, headers=headers)
+    client.post('/habits/1/log', json={'log_date': '2026-03-03'}, headers=headers)
+    client.post('/habits/1/log', json={'log_date': '2026-03-02'}, headers=headers)
+
+    response = client.get('/habits/1/streak', headers=headers)
+    assert response.status_code == 200
+    data = response.json()
+    assert data['habit_id'] == 1
+    assert data['current_streak'] == 3
+
+def test_daily_streak_break(client):
+    headers = get_auth_headers(client)
+
+    response = client.post('/habits', json={'name': 'habit', 'frequency': 'daily'}, headers=headers)
+    assert response.status_code == 200
+
+    client.post('/habits/1/log', json={'log_date': '2026-03-04'}, headers=headers)
+    client.post('/habits/1/log', json={'log_date': '2026-03-02'}, headers=headers)
+
+    response = client.get('/habits/1/streak', headers=headers)
+    assert response.status_code == 200
+
+    assert response.json()['habit_id'] == 1
+    assert response.json()['current_streak'] == 1
+
+def test_weekly_streak_consecutive(client):
+    headers = get_auth_headers(client)
+
+    response = client.post('/habits', json={'name': 'habit', 'frequency': 'weekly'}, headers=headers)
+    assert response.status_code == 200
+
+    client.post('/habits/1/log', json={'log_date': '2026-03-04'}, headers=headers)
+    client.post('/habits/1/log', json={'log_date': '2026-02-25'}, headers=headers)
+    client.post('/habits/1/log', json={'log_date': '2026-02-18'}, headers=headers)
+
+    response = client.get('/habits/1/streak', headers=headers)
+    assert response.status_code == 200
+    data = response.json()
+
+    assert data['habit_id'] == 1
+    assert data['current_streak'] == 3
+
+def test_weekly_streak_break(client):
+    headers = get_auth_headers(client)
+
+    response = client.post('/habits', json={'name': 'habit', 'frequency': 'weekly'}, headers=headers)
+    assert response.status_code == 200
+
+    client.post('/habits/1/log', json={'log_date': '2026-03-04'}, headers=headers)
+    client.post('/habits/1/log', json={'log_date': '2026-02-18'}, headers=headers)
+
+    response = client.get('/habits/1/streak', headers=headers)
+    assert response.status_code == 200
+    data = response.json()
+
+    assert data['habit_id'] == 1
+    assert data['current_streak'] == 1
+
+def test_user_cannot_see_other_users_streak(client):
+    headers_a = get_auth_headers(client, email='user_a@example.com', password='password_a')
+
+    response = client.post('/habits', json={'name': 'habit', 'frequency': 'daily'}, headers=headers_a)
+    assert response.status_code == 200
+    response = client.post('/habits/1/log', json={'log_date': '2026-03-04'}, headers=headers_a)
+    assert response.status_code == 200
+    response = client.get('/habits/1/streak', headers=headers_a)
+    assert response.status_code == 200
+    data = response.json()
+    assert data['current_streak'] == 1
+
+    headers_b = get_auth_headers(client, email='user_b@example.com', password='password_b')
+
+    response = client.get('/habits/1/streak', headers=headers_b)
+    assert response.status_code == 404
