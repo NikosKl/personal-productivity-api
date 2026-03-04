@@ -4,9 +4,10 @@ from starlette.status import HTTP_204_NO_CONTENT
 from app.core.security import get_current_user
 from app.db.session import get_db
 from app.models.user import User
-from app.schemas.habit import HabitRead, HabitCreate, HabitUpdate, HabitLogRead, HabitLogCreate
+from app.schemas.habit import HabitRead, HabitCreate, HabitUpdate, HabitLogRead, HabitLogCreate, HabitStreakRead
 from app.services.habits import create_habit, get_user_habits, update_habit, HabitNotFoundError, delete_habit, \
     log_habit, HabitAlreadyLoggedError
+from app.services.statistics import get_habit_streak
 
 router = APIRouter(prefix="/habits", tags=["Habits"])
 
@@ -44,3 +45,12 @@ def log_habit_route(habit_id: int, log_data: HabitLogCreate, db: Session = Depen
         raise HTTPException(status_code=404, detail="Habit not found")
     except HabitAlreadyLoggedError:
         raise HTTPException(status_code=400, detail="Habit already logged")
+
+@router.get('/{habit_id}/streak', response_model=HabitStreakRead)
+def habit_streak_route(habit_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    try:
+        streak = get_habit_streak(db, current_user, habit_id)
+        return {"habit_id": habit_id, "current_streak": streak}
+
+    except HabitNotFoundError:
+        raise HTTPException(status_code=404, detail="Habit not found")
