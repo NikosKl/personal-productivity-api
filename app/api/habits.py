@@ -5,8 +5,7 @@ from app.core.security import get_current_user
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.habit import HabitRead, HabitCreate, HabitUpdate, HabitLogRead, HabitLogCreate, HabitStreakRead
-from app.services.habits import create_habit, get_user_habits, update_habit, HabitNotFoundError, delete_habit, \
-    log_habit, HabitAlreadyLoggedError
+from app.services.habits import create_habit, get_user_habits, update_habit, HabitNotFoundError, delete_habit, log_habit, HabitAlreadyLoggedError
 from app.services.statistics import get_habit_streak
 
 router = APIRouter(prefix="/habits", tags=["Habits"])
