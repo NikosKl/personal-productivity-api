@@ -6,6 +6,7 @@ bcrypt==3.2.2
 certifi==2026.1.4
 cffi==2.0.0
 click==8.3.1
+Deprecated==1.3.1
 dnspython==2.8.0
 email-validator==2.3.0
 fastapi==0.128.0
@@ -19,6 +20,7 @@ httpx==0.28.1
 idna==3.11
 iniconfig==2.3.0
 Jinja2==3.1.6
+limits==5.8.0
 Mako==1.3.10
 markdown-it-py==4.0.0
 MarkupSafe==3.0.3
@@ -45,6 +47,7 @@ rich-toolkit==0.17.1
 rignore==0.7.6
 sentry-sdk==2.49.0
 shellingham==1.5.4
+slowapi==0.1.9
 SQLAlchemy==2.0.45
 starlette==0.50.0
 typer==0.21.1
@@ -55,3 +58,4 @@ uvicorn==0.40.0
 uvloop==0.22.1
 watchfiles==1.1.1
 websockets==16.0
+wrapt==2.1.2
