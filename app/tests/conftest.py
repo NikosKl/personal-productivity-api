@@ -7,6 +7,7 @@ from starlette.testclient import TestClient
 
 import os
 
+os.environ['ENVIRONMENT'] = 'test'
 os.environ['JWT_SECRET'] = 'test_secret'
 TEST_DATABASE_URL = os.environ.get('TEST_DATABASE_URL')
 
