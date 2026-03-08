@@ -10,6 +10,10 @@ from app.api.tasks import router as tasks_router
 from app.api.habits import router as habits_router
 from app.api.analytics import router as analytics_router
 import app.models.user
+from slowapi.middleware import SlowAPIMiddleware
+from slowapi.errors import RateLimitExceeded
+from slowapi import _rate_limit_exceeded_handler
+from app.core.rate_limit import limiter
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -21,6 +25,11 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(lifespan=lifespan)
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
+
 app.include_router(auth_router)
 app.include_router(tasks_router)
 app.include_router(habits_router)

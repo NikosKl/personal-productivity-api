@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import EmailStr, TypeAdapter
 from app.core.security import create_access_token, get_current_user
@@ -7,11 +7,13 @@ from sqlalchemy.orm import Session
 from app.models.user import User
 from app.schemas.user import UserCreate, UserRead, Token
 from app.services.users import create_user, UserAlreadyExistsError, authenticate_user, InvalidCredentialsError
+from app.core.rate_limit import limiter
 
 router = APIRouter(prefix='/auth', tags=['Auth'])
 
 @router.post('/register', response_model=UserRead)
-def register_user_route(user: UserCreate, db: Session = Depends(get_db)):
+@limiter.limit("3/minute")
+def register_user_route(request: Request, user: UserCreate, db: Session = Depends(get_db)):
     try:
         created_user = create_user(
             db,
@@ -23,7 +25,8 @@ def register_user_route(user: UserCreate, db: Session = Depends(get_db)):
     return created_user
 
 @router.post('/login', response_model=Token)
-def login_user_route(user: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+def login_user_route(request: Request, user: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     try:
         email = TypeAdapter(EmailStr).validate_python(user.username)
         authenticated_user = authenticate_user(
