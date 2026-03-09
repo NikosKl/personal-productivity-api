@@ -18,11 +18,11 @@ https://personal-productivity-api.onrender.com
 
 Interactive documentation: 
 
-/docs
+https://personal-productivity-api.onrender.com/docs
 
 Alternative documentation:
 
-/redoc
+https://personal-productivity-api.onrender.com/redoc
 
 ---
 
@@ -55,7 +55,7 @@ Alternative documentation:
 - PostgreSQL database
 - Alembic database migrations
 - Automated testing with Pytest
-- CI pipeline with GitHub actions
+- CI pipeline with GitHub Actions
 - Production deployment on Render
 
 ---
@@ -69,7 +69,7 @@ Alternative documentation:
 - PostgreSQL
 
 **ORM**
-- SQLalchemy 2.0
+- SQLAlchemy 2.0
 
 **Migrations**
 - Alembic
@@ -101,7 +101,7 @@ cd personal-productivity-api
 ```bash
 python -m venv .venv
 source .venv/bin/activate # on macOS/Linux
-venv\Scripts\activate # on Windows
+.venv\Scripts\activate # on Windows
 ```
 
 ### Install dependencies
@@ -114,6 +114,7 @@ pip install -r requirements.txt
 ```bash
 cp .env.example .env
 ```
+Copy the template and update the values if needed (database credentials or JWT secret)
 
 ### Run database migrations
 
