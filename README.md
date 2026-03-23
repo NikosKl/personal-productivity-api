@@ -14,15 +14,15 @@ The project demonstrates backend engineering practices including authentication,
 
 ## Live API
 
-https://personal-productivity-api.onrender.com
+https://personal-productivity-api-1.onrender.com
 
 Interactive documentation: 
 
-https://personal-productivity-api.onrender.com/docs
+https://personal-productivity-api-1.onrender.com/docs
 
 Alternative documentation:
 
-https://personal-productivity-api.onrender.com/redoc
+https://personal-productivity-api-1.onrender.com/redoc
 
 ---
 
