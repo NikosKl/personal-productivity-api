@@ -1,15 +1,22 @@
+import os
+from pathlib import Path
+
 from dotenv import load_dotenv
 load_dotenv()
-import pytest
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from starlette.testclient import TestClient
-
-import os
+load_dotenv(Path(__file__).resolve().parents[1] / "app" / ".env")
 
 os.environ['ENVIRONMENT'] = 'test'
 os.environ['JWT_SECRET'] = 'test_secret'
 TEST_DATABASE_URL = os.environ.get('TEST_DATABASE_URL')
+
+if not TEST_DATABASE_URL:
+    raise RuntimeError('TEST_DATABASE_URL is not set')
+os.environ['DATABASE_URL'] = TEST_DATABASE_URL
+
+import pytest
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from starlette.testclient import TestClient
 
 from app.db.base import Base
 from app.db.session import get_db
